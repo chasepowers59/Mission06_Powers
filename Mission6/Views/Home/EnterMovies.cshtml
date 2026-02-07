@@ -1,0 +1,36 @@
+﻿@{
+    ViewData["Title"] = "Enter Movies Into The Collection";
+}
+@model Application
+
+<form method="post">
+    <label>Movie Name</label>
+    <input asp-for="MovieName" required/>
+    <br />
+    <label>Category</label>
+    <input asp-for="Category" required />
+    <br />
+    <label>Year</label>
+    <input asp-for="Year" required />
+    <br />
+    <label>Directory</label>
+    <input asp-for="Director" required />
+    <br/>
+    <label>What would you rate the movie?</label>
+    <input asp-for="MovieRating" required/>
+    <br />
+    <label>Is this Edited?</label>
+    <input asp-for="IsEdited" />
+    <br />
+    <label>Lent To:</label>
+    <input asp-for="LentTo" />
+    <br />
+    <label>Notes</label>
+    <input asp-for="Notes" maxlength="25"/>
+
+
+
+
+    <button type="submit">Submit new movie review!</button>
+</form>
+

@@ -13,9 +13,6 @@ builder.Services.AddDbContext<Mission06Context>(options =>
     options.UseSqlite($"Data Source={dbPath}"));
 
 
-var cs = builder.Configuration.GetConnectionString("Connection");
-Console.WriteLine($"[DB] Connection string: {cs}");
-
 builder.Services.AddControllersWithViews();     // registers MVC and related services
 builder.Services.AddAuthorization();           // explicitly register authorization services
 

@@ -10,13 +10,18 @@ namespace Mission06_Powers.Models
         [Required]
         public string MovieName { get; set; } = string.Empty;
         [Required]
-        public int MovieRating { get; set; }
+        public string MovieRating { get; set; } = string.Empty;
 
-        public bool IsEdited { get; set; }
+
+        public bool? IsEdited { get; set; }
         public string? LentTo { get; set; }
-        public string? Notes { get; set; }
-        [Range(0,25)]
+        [Range(1888, 2100)]
+        [Required]
         public int Year { get; set; }
+
+        [MaxLength(25)]
+        public string? Notes { get; set; }
+
         [Required]
         public string Director { get; set; } = string.Empty;
         [Required]

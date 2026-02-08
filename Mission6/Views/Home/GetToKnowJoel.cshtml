@@ -1,12 +1,35 @@
 ﻿@{
     ViewData["Title"] = "Get to Know Joel";
 }
-@model Application
 
-<a href="https://www.qwcomedy.com/">Go to Quick Wits Comedy</a>
-<br />
-<a href="https://baconsale.com/">Baconsale site</a> 
-<br />
-<a href=https://baconsale.com >
-<img src="c:\users\cvpow\source\repos\mission6\mission6\wwwroot\baconsalekate.jpg" />
-</a>
+<div class="container py-4">
+    <h1 class="display-6 mb-3">Get to Know Joel</h1>
+
+    <p class="text-muted mb-4">
+        Check out Joel’s comedy and film projects below.
+    </p>
+
+    <div class="d-flex flex-column gap-2 mb-4">
+        <a class="btn btn-outline-primary w-auto"
+           href="https://www.qwcomedy.com/"
+           target="_blank" rel="noopener">
+            Quick Wits Comedy
+        </a>
+
+        <a class="btn btn-outline-primary w-auto"
+           href="https://baconsale.com/"
+           target="_blank" rel="noopener">
+            Baconsale
+        </a>
+    </div>
+
+    <div class="text-center">
+        <a href="https://baconsale.com/" target="_blank" rel="noopener">
+            <img src="~/images/baconsalekate.jpg"
+                 alt="Baconsale"
+                 class="img-fluid rounded shadow-sm"
+                 style="max-height: 350px;" />
+        </a>
+        <div class="text-muted small mt-2">Click the image to visit Baconsale.</div>
+    </div>
+</div>

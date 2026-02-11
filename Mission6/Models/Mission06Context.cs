@@ -6,6 +6,7 @@ namespace Mission06_Powers.Models
     {
         public Mission06Context(DbContextOptions<Mission06Context> options) : base(options) { }
 
-        public DbSet<Application> Applications { get; set; } = null!;
+        public DbSet<Movies> Movies { get; set; } = null!;
+        public DbSet<Categories> Categories { get; set; } = null!;
     }
 }

@@ -6,8 +6,8 @@ using Mission06_Powers.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var dbPath = Path.Combine(builder.Environment.ContentRootPath, "Mission06_Powers.sqlite"); // my pathing got all messed up, this was the fix. I renamed my folder and bad news
-Console.WriteLine($"[DB] Absolute path: {dbPath}");
+var dbPath = Path.Combine(builder.Environment.ContentRootPath, "JoelHiltonMovieCollection.sqlite"); // my pathing got all messed up, this was the fix. I renamed my folder and bad news
+Console.WriteLine($"[DB] Absolute path: {dbPath}"); // had to change pathing to be the new db
 
 builder.Services.AddDbContext<Mission06Context>(options =>
     options.UseSqlite($"Data Source={dbPath}"));
@@ -35,7 +35,7 @@ app.MapStaticAssets();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
+    pattern: "{controller=Home}/{action=Index}/{id?}") // ? means I may not enter the id....
     .WithStaticAssets();
 
 

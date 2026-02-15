@@ -7,9 +7,9 @@ namespace Mission06_Powers.Models
         [Key]
         public int MovieID { get; set; }
 
-        [Required]
-        public int CategoryId { get; set; }
-        public Categories? Category { get; set; } // instance of the class, saying the CategoryId links to a name in another table
+        // CategoryId should NOT be required per assignment
+        public int? CategoryId { get; set; }  // Changed to nullable
+        public Categories? Category { get; set; }
 
         [Required]
         public string Title { get; set; } = string.Empty;
@@ -18,7 +18,7 @@ namespace Mission06_Powers.Models
         [Required]
         public int Year { get; set; }
 
-        // These are nullable in the provided DB (your data shows Director can be blank)
+        // Optional fields
         public string? Director { get; set; }
         public string? Rating { get; set; }
         public string? LentTo { get; set; }
@@ -26,7 +26,7 @@ namespace Mission06_Powers.Models
         [MaxLength(25)]
         public string? Notes { get; set; }
 
-        // Required by mission for new entries
+        // Required by mission
         [Required]
         public bool Edited { get; set; }
 

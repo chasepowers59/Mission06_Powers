@@ -1,105 +1,169 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 using Mission06_Powers.Models;
 using System.Diagnostics;
-
+using System.Text;
 
 namespace Mission06_Powers.Controllers
 {
-
     public class HomeController : Controller
     {
-        private Mission06Context _context; // whenever the HomeController is made, create instance of database
-        public HomeController(Mission06Context DataInstance) // constructor for home controller
+        private Mission06Context _context;
+
+        public HomeController(Mission06Context DataInstance)
         {
             _context = DataInstance;
         }
-        public IActionResult Index() //main page
+
+        public IActionResult Index()
         {
             return View();
-        }
-
-        public IActionResult EnterMovies() // takes the values in Categories and makes a list
-        {
-            ViewBag.Categories = _context.Categories
-                .OrderBy(c => c.CategoryName)
-                .ToList();
-
-            return View();
-        }
-
-
-        [HttpPost]
-        public IActionResult EnterMovies(Movies results) // inputting a new movie into the database, POST 
-        {
-            if (!ModelState.IsValid)
-            {
-                ViewBag.Categories = _context.Categories
-                    .OrderBy(c => c.CategoryName)
-                    .ToList();
-
-                return View(results);
-            }
-
-            _context.Movies.Add(results);
-            _context.SaveChanges();
-
-            TempData["Success"] = "Movie saved successfully!";
-            return RedirectToAction("Index");
-        }
-
-
-        public IActionResult GetToKnowJoel() // 2nd page
-        {
-            return View();
-        }
-
-        public IActionResult DisplayMovies() // Taking info from the database, passing it to a new view (query)
-        {
-            //Link Query
-            var movies = _context.Movies
-                                    .Include(m => m.Category)
-                                    .OrderBy(m => m.MovieID)
-                                    .ToList();
-
-            return View("DisplayMovies", movies); // view and model, MOST WE CAN DO! no more.
         }
 
         [HttpGet]
-        public IActionResult Edit(int id) // NAME MUST MATCH ROUTE!!!!
+        public IActionResult EnterMovies()
         {
-            var MovieToEdit = _context.Movies.Single(x => x.MovieID == id); // grab 1 record from movies db
-
             ViewBag.Categories = _context.Categories
                 .OrderBy(c => c.CategoryName)
                 .ToList();
+            return View();
+        }
 
-            return View("EnterMovies", MovieToEdit); // need the viewbag, so we use it here too - same thing
+        [HttpPost]
+        public IActionResult EnterMovies(Movies results)
+        {
+            Console.WriteLine("=== POST REQUEST RECEIVED ===");
+            Console.WriteLine($"Title: {results?.Title}");
+            Console.WriteLine($"Year: {results?.Year}");
+            Console.WriteLine($"Edited: {results?.Edited}");
+            Console.WriteLine($"CopiedToPlex: {results?.CopiedToPlex}");
+            Console.WriteLine($"CategoryId: {results?.CategoryId}");
+            Console.WriteLine($"ModelState.IsValid: {ModelState.IsValid}");
+
+            if (!ModelState.IsValid)
+            {
+                Console.WriteLine("=== MODEL STATE ERRORS ===");
+                foreach (var key in ModelState.Keys)
+                {
+                    var state = ModelState[key];
+                    if (state.Errors.Count > 0)
+                    {
+                        Console.WriteLine($"Field: {key}");
+                        foreach (var error in state.Errors)
+                        {
+                            Console.WriteLine($"  Error: {error.ErrorMessage}");
+                        }
+                    }
+                }
+
+                ViewBag.Categories = _context.Categories
+                    .OrderBy(c => c.CategoryName)
+                    .ToList();
+                return View(results);
+            }
+
+            try
+            {
+                if (results.MovieID == 0)
+                {
+                    // Adding new movie
+                    _context.Movies.Add(results);
+                }
+                else
+                {
+                    // Updating existing movie
+                    _context.Movies.Update(results);
+                }
+
+                int recordsSaved = _context.SaveChanges();
+                Console.WriteLine($"=== SUCCESS: {recordsSaved} record(s) saved ===");
+                TempData["Success"] = results.MovieID == 0
+                    ? "Movie added successfully!"
+                    : "Movie updated successfully!";
+                return RedirectToAction("DisplayMovies");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"=== DATABASE ERROR ===");
+                Console.WriteLine($"Message: {ex.Message}");
+                Console.WriteLine($"Inner Exception: {ex.InnerException?.Message}");
+
+                ModelState.AddModelError("", $"Unable to save changes: {ex.Message}");
+                ViewBag.Categories = _context.Categories
+                    .OrderBy(c => c.CategoryName)
+                    .ToList();
+                return View(results);
+            }
+        }
+
+        public IActionResult GetToKnowJoel()
+        {
+            return View();
+        }
+
+        public IActionResult DisplayMovies()
+        {
+            var movies = _context.Movies
+                .Include(m => m.Category)
+                .OrderBy(m => m.MovieID)
+                .ToList();
+            return View("DisplayMovies", movies);
+        }
+
+        [HttpGet]
+        public IActionResult Edit(int id)
+        {
+            var MovieToEdit = _context.Movies.Single(x => x.MovieID == id);
+            ViewBag.Categories = _context.Categories
+                .OrderBy(c => c.CategoryName)
+                .ToList();
+            return View("EnterMovies", MovieToEdit);
         }
 
         [HttpPost]
         public IActionResult Edit(Movies movie)
         {
-            _context.Update(movie);
-            _context.SaveChanges();
+            Console.WriteLine($"=== EDIT POST RECEIVED for MovieID: {movie.MovieID} ===");
 
-            return RedirectToAction("DisplayMovies"); // need to use the action, because the action pulls in db data
+            try
+            {
+                _context.Update(movie);
+                int recordsSaved = _context.SaveChanges();
+                Console.WriteLine($"=== EDIT SUCCESS: {recordsSaved} record(s) updated ===");
+                return RedirectToAction("DisplayMovies");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"=== EDIT ERROR: {ex.Message} ===");
+                throw;
+            }
         }
 
         [HttpGet]
         public IActionResult Delete(int id)
         {
             var DeleteRecord = _context.Movies.Single(x => x.MovieID == id);
-
-            return View(DeleteRecord); // it will pass the record to the Delete view
+            return View(DeleteRecord);
         }
-        [HttpPost]
-        public IActionResult Delete( Movies movie)
-        {
-            _context.Movies.Remove(movie); // make change
-            _context.SaveChanges(); // confirm the change
 
-            return RedirectToAction("DisplayMovies");
+        [HttpPost]
+        public IActionResult Delete(Movies movie)
+        {
+            Console.WriteLine($"=== DELETE POST RECEIVED for MovieID: {movie.MovieID} ===");
+
+            try
+            {
+                _context.Movies.Remove(movie);
+                int recordsSaved = _context.SaveChanges();
+                Console.WriteLine($"=== DELETE SUCCESS: {recordsSaved} record(s) deleted ===");
+                return RedirectToAction("DisplayMovies");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"=== DELETE ERROR: {ex.Message} ===");
+                throw;
+            }
         }
     }
 }

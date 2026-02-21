@@ -22,9 +22,9 @@ namespace Mission06_Powers.Controllers
         }
 
         [HttpGet]
-        public IActionResult EnterMovies()
+        public IActionResult EnterMovies() 
         {
-            ViewBag.Categories = _context.Categories
+            ViewBag.Categories = _context.Categories // ViewBag packages up a list of values that we can use to display - great for dropdowns like we will use
                 .OrderBy(c => c.CategoryName)
                 .ToList();
             return View();
@@ -41,13 +41,22 @@ namespace Mission06_Powers.Controllers
             Console.WriteLine($"CategoryId: {results?.CategoryId}");
             Console.WriteLine($"ModelState.IsValid: {ModelState.IsValid}");
 
+            if (results == null)
+            {
+                ModelState.AddModelError("", "Movie data is missing.");
+                ViewBag.Categories = _context.Categories
+                    .OrderBy(c => c.CategoryName)
+                    .ToList();
+                return View(results);
+            }
+
             if (!ModelState.IsValid)
             {
                 Console.WriteLine("=== MODEL STATE ERRORS ===");
                 foreach (var key in ModelState.Keys)
                 {
                     var state = ModelState[key];
-                    if (state.Errors.Count > 0)
+                    if (state != null && state.Errors.Count > 0)
                     {
                         Console.WriteLine($"Field: {key}");
                         foreach (var error in state.Errors)
